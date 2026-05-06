@@ -16,7 +16,7 @@ final class CallInitiateComponent: BridgeComponent {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 
-    static func telURL(for phoneNumber: String) -> URL? {
+    nonisolated static func telURL(for phoneNumber: String) -> URL? {
         let digits = phoneNumber.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
         guard !digits.isEmpty else { return nil }
         return URL(string: "tel://\(digits)")
