@@ -21,14 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode 16
-        run: sudo xcode-select -s /Applications/Xcode_16.app
-
-      - name: Show toolchain versions
+      - name: Show toolchain versions and available simulators
         run: |
           xcodebuild -version
           swift --version
           xcrun simctl list runtimes
+          xcrun simctl list devices available iPhone
 
       - name: Install xcodegen
         run: brew install xcodegen
