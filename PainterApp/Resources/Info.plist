@@ -41,9 +41,20 @@
     </array>
     <key>NSAppTransportSecurity</key>
     <dict>
-        <!-- Allow localhost during development only -->
         <key>NSAllowsLocalNetworking</key>
         <true/>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>localhost</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+            </dict>
+        </dict>
     </dict>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+    </array>
 </dict>
 </plist>

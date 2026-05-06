@@ -4,18 +4,21 @@ import UIKit
 final class CallInitiateComponent: BridgeComponent {
     override class var name: String { "call-initiate" }
 
-    override func onReceive(message: Message) {
-        guard message.event == "dial",
-              let phoneNumber = message.data["phone"] as? String else { return }
-        dial(phoneNumber)
+    private struct CallPayload: Decodable {
+        let phone: String
     }
 
-    // MARK: - Private
-
-    private func dial(_ phoneNumber: String) {
-        let digits = phoneNumber.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-        guard let url = URL(string: "tel://\(digits)"),
+    override func onReceive(message: Message) {
+        guard message.event == "call",
+              let payload: CallPayload = message.data(),
+              let url = Self.telURL(for: payload.phone),
               UIApplication.shared.canOpenURL(url) else { return }
-        UIApplication.shared.open(url)
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
+
+    static func telURL(for phoneNumber: String) -> URL? {
+        let digits = phoneNumber.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        guard !digits.isEmpty else { return nil }
+        return URL(string: "tel://\(digits)")
     }
 }

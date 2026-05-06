@@ -13,4 +13,13 @@ final class BridgeComponentTests: XCTestCase {
     func testPushRegistrationComponentName() {
         XCTAssertEqual(PushRegistrationComponent.name, "push-registration")
     }
+
+    func testTelURLStripsNonDigits() {
+        let url = CallInitiateComponent.telURL(for: "+1 (555) 123-4567")
+        XCTAssertEqual(url?.absoluteString, "tel://15551234567")
+    }
+
+    func testTelURLRejectsEmptyDigits() {
+        XCTAssertNil(CallInitiateComponent.telURL(for: "no digits here"))
+    }
 }

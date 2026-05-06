@@ -1,33 +1,31 @@
 import HotwireNative
 import UIKit
 
+@MainActor
 final class MainNavigator {
-    let navigator = Navigator()
+    private let navigator: Navigator
 
     init() {
-        configureBridgeComponents()
-        configurePathConfiguration()
-    }
-
-    func start(in window: UIWindow) {
-        window.rootViewController = navigator.rootViewController
-        navigator.route(AppConfig.startURL)
-    }
-
-    // MARK: - Private
-
-    private func configureBridgeComponents() {
-        BridgeComponent.register([
+        Hotwire.registerBridgeComponents([
             PushRegistrationComponent.self,
             AudioPlayerComponent.self,
             CallInitiateComponent.self,
         ])
+
+        Hotwire.loadPathConfiguration(from: [
+            .server(AppConfig.pathConfigurationURL),
+        ])
+
+        navigator = Navigator(
+            configuration: Navigator.Configuration(
+                name: "main",
+                startLocation: AppConfig.startURL
+            )
+        )
     }
 
-    private func configurePathConfiguration() {
-        navigator.pathConfiguration = PathConfiguration(sources: [
-            .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")),
-            .server(AppConfig.pathConfigurationURL),
-        ].compactMap { $0 })
+    func start(in window: UIWindow) {
+        window.rootViewController = navigator.rootViewController
+        navigator.start()
     }
 }

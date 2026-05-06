@@ -5,38 +5,27 @@ import UserNotifications
 final class PushRegistrationComponent: BridgeComponent {
     override class var name: String { "push-registration" }
 
+    private struct TokenPayload: Encodable {
+        let token: String
+        let platform: String
+    }
+
     override func onReceive(message: Message) {
         guard message.event == "request-token" else { return }
-        requestAPNSToken()
+        Task { await requestAndReply() }
     }
 
-    // MARK: - Private
-
-    private func requestAPNSToken() {
+    private func requestAndReply() async {
         let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, _ in
-            guard granted else { return }
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-                self?.listenForToken()
+        let granted = (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+        guard granted else { return }
+
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            AppDelegate.requestAPNSToken { [weak self] token in
+                let payload = TokenPayload(token: token, platform: "apns")
+                self?.reply(to: "request-token", with: payload)
+                continuation.resume()
             }
         }
-    }
-
-    private func listenForToken() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(tokenReceived(_:)),
-            name: .apnsTokenReceived,
-            object: nil
-        )
-    }
-
-    @objc private func tokenReceived(_ notification: Foundation.Notification) {
-        guard let token = notification.object as? String else { return }
-        NotificationCenter.default.removeObserver(self, name: .apnsTokenReceived, object: nil)
-
-        let data = MessageData(metadata: [:], data: ["token": token, "platform": "ios"])
-        reply(with: message(replacing: data))
     }
 }
