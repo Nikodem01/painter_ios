@@ -23,7 +23,7 @@ settings:
 packages:
   HotwireNative:
     url: https://github.com/hotwired/hotwire-native-ios
-    minVersion: 1.2.0
+    from: 1.2.0
 
 targets:
   PainterApp:
