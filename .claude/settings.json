@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "xcode": {
+      "command": "npx",
+      "args": ["-y", "@getsentry/xcode-build-mcp"],
+      "description": "Primary Xcode MCP — build, test, archive, simulator management, LLDB, SPM (59 tools). Use before writing any xcodebuild command."
+    },
+    "ios-simulator": {
+      "command": "npx",
+      "args": ["-y", "ios-simulator-mcp"],
+      "description": "iOS Simulator interaction — UI accessibility tree, tap/swipe/type, screenshots. Use before interacting with the simulator."
+    },
+    "spm": {
+      "command": "npx",
+      "args": ["-y", "spm-mcp"],
+      "description": "Swift Package Manager — add, update, resolve, clean packages without raw `swift package` commands."
+    }
+  }
+}

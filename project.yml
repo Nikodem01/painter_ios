@@ -1,0 +1,64 @@
+# XcodeGen spec — run `xcodegen generate` on macOS to produce PainterApp.xcodeproj
+# Install: brew install xcodegen
+
+name: PainterApp
+
+options:
+  bundleIdPrefix: com.liftbyai
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: 6.0
+    MARKETING_VERSION: 1.0.0
+    CURRENT_PROJECT_VERSION: 1
+    IPHONEOS_DEPLOYMENT_TARGET: 16.0
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""  # set your Apple Team ID here
+
+packages:
+  HotwireNative:
+    url: https://github.com/hotwired/hotwire-native-ios
+    minVersion: 1.2.0
+
+targets:
+  PainterApp:
+    type: application
+    platform: iOS
+    sources:
+      - PainterApp
+    resources:
+      - PainterApp/Resources
+    dependencies:
+      - package: HotwireNative
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.liftbyai.painter
+        INFOPLIST_FILE: PainterApp/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  PainterAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - PainterAppTests
+    dependencies:
+      - target: PainterApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.liftbyai.painterTests
+
+  PainterAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - PainterAppUITests
+    dependencies:
+      - target: PainterApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.liftbyai.painterUITests
