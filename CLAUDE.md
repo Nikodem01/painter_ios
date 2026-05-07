@@ -22,6 +22,30 @@ xcodebuild test -scheme PainterApp \
 
 > **Note:** The `.xcodeproj` is not committed — generate it locally with `xcodegen generate` after cloning.
 
+## Dev loop (no Mac)
+
+The maintainer of this repo does **not** have a Mac. There is no local Xcode, no local simulator, no local `xcodebuild`. The Quick start commands above are what CI runs on `macos-15` — they are not runnable here.
+
+The actual dev loop:
+1. Edit Swift / config / plist / yml in VSCode (Linux / WSL).
+2. `git commit` locally.
+3. `git push origin main` — triggers CI on `macos-15`.
+4. `gh run watch <id>` (or watch in browser) — wait ~5 min for build + test.
+5. If green: change is verified. If red: read `gh run view <id> --log-failed`, fix, push again.
+
+**Implications:**
+- CI is the build machine. Treat a green run as the only ground truth that Swift code compiles.
+- Tests in `PainterAppTests` and `PainterAppUITests` are the strongest verification available without a real device. Lean on them.
+- `paths-ignore` in [.github/workflows/ci.yml](.github/workflows/ci.yml) skips CI for `**.md` / `docs/**` / `.gitignore` / `LICENSE` so doc commits don't burn time.
+
+**What CI cannot verify:**
+- Hands-on simulator interaction (tap a button, see the dialer / Now Playing UI / permission prompt)
+- Real-device APNS delivery (needs Apple Dev account + device)
+- Lock-screen audio + Control Center behavior (needs a real device)
+- Real Rails session through the WebView (CI doesn't run a Rails server)
+
+For these, options are: borrow a Mac, rent a cloud Mac (MacInCloud / MacStadium / Codemagic), or ship to TestFlight via cloud-built signed IPA once an Apple Developer account is provisioned.
+
 ## Stack
 
 - **Language:** Swift 6, strict concurrency on (`@MainActor`-isolated bridge components)
@@ -165,6 +189,7 @@ The Swift code already sends `platform: "apns"` (matching `PushTokensController:
 - **CallInitiateComponent on Android.** If the Kotlin counterpart was scaffolded with the same `"dial"` event-name bug as iOS used to have, the Android side won't dial either. Verify in `painter_android`.
 - **No real APNS yet.** See APNS section above.
 - **No app icon, no launch screen polish.** `Info.plist` references `LaunchScreen` but no storyboard ships in `PainterApp/Resources/`. Generates a black launch on first run.
+- **No interactive simulator verification possible from this machine.** See [Dev loop (no Mac)](#dev-loop-no-mac). Closing this gap requires either cloud Mac access or shipping to a TestFlight build on a real device.
 
 ## Companion repos
 
