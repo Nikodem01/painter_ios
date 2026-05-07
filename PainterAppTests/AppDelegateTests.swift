@@ -4,7 +4,6 @@ import XCTest
 @MainActor
 final class AppDelegateTests: XCTestCase {
     override func setUp() async throws {
-        try await super.setUp()
         AppDelegate.apnsToken = nil
         AppDelegate.apnsTokenHandlers.removeAll()
     }
@@ -12,7 +11,6 @@ final class AppDelegateTests: XCTestCase {
     override func tearDown() async throws {
         AppDelegate.apnsToken = nil
         AppDelegate.apnsTokenHandlers.removeAll()
-        try await super.tearDown()
     }
 
     func testRequestAPNSTokenFiresHandlerImmediatelyWhenCached() {
